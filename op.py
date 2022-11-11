@@ -99,7 +99,7 @@ glEnableVertexAttribArray(1)
 def calculateMatrix(angle):
   i = glm.mat4(1)
   translate = glm.translate(i, glm.vec3(0, 0, 0))
-  rotate = glm.rotate(i, glm.radians(angle), glm.vec3(0, 1, 0))
+  rotate = glm.rotate(i, glm.radians(angle), glm.vec3(1, 1, 0.5))
   scale = glm.scale(i, glm.vec3(1, 1, 1))
 
   model = translate * rotate * scale
@@ -133,29 +133,31 @@ r = 0
 
 running = True
 while running:
-  r += 1
+  # Clear
   glClear(GL_COLOR_BUFFER_BIT)
 
+  # Calculate
+  r += 1
   color1 = random.random()
   color2 = random.random()
   color3 = random.random()
-
   color = glm.vec3(color1, color2, color3)
+  color = glm.vec3(1, 1, 1)
 
   glUniform3fv(
-      glGetUniformLocation(shader,'color'),
-      1,
-      glm.value_ptr(color)
+    glGetUniformLocation(shader,'color'),
+    1,
+    glm.value_ptr(color)
   )
 
   calculateMatrix(r)
-
-  pygame.time.wait(10)
-
   glDrawArrays(GL_TRIANGLES, 0, 3)
+  pygame.time.wait(1)
 
+  # Flip
   pygame.display.flip()
 
+  # Event Stack
   for event in pygame.event.get():
     match event.type:
       case pygame.QUIT:
