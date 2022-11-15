@@ -10,6 +10,12 @@
   posee bastantes figuras estaticas. Sin embargo tambien tiene algunos gliders que 
   eventualmente chocan con estos provanco patrones totalmente inesperados.
 
+- La implementacion utiliza la funcion fill de pygame para pintar los pixeles del juego.
+
+- Se utiliza 1 array de 3 dimensiones que representa el "Double Framebuffer".
+
+- En cada frame se pintan nuevamente los pixeles que reflejan cambios por temas de optimizacion.
+
 ## 🗃️Estructura de Archivos
 - `main.py`: Implementacion de Conway´s Game of Life.
 
