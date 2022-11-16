@@ -12,7 +12,6 @@ screen = pygame.display.set_mode(
   pygame.OPENGL | pygame.DOUBLEBUF
 )
 
-
 # Programacion de Shaders
 vertex_shader = '''
 #version 460
@@ -23,8 +22,8 @@ uniform mat4 amatrix;
 
 void main()
 {
-    gl_Position = amatrix * vec4(position, 1.0f);
-    ourColor = vertexColor;
+  gl_Position = amatrix * vec4(position, 1.0f);
+  ourColor = vertexColor;
 }
 '''
 fragment_shader = '''
@@ -36,16 +35,17 @@ in vec3 ourColor;
 
 void main()
 {
-    // fragColor = vec4(ourColor.x, ourColor.y, ourColor.z, 1.0f);
-    fragColor = vec4(color, 1.0f);
+  // fragColor = vec4(ourColor.x, ourColor.y, ourColor.z, 1.0f);
+  fragColor = vec4(color, 1.0f);
 }
 '''
+
 # Compilacion de shaders
 compiled_vertex_shader = compileShader(vertex_shader, GL_VERTEX_SHADER)
 compiled_fragment_shader = compileShader(fragment_shader, GL_FRAGMENT_SHADER)
 shader = compileProgram(
-    compiled_vertex_shader,
-    compiled_fragment_shader
+  compiled_vertex_shader,
+  compiled_fragment_shader
 )
 glUseProgram(shader)
 
