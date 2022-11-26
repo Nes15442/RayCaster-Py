@@ -27,6 +27,7 @@ Cube = Obj('./models/SpaceX/f.obj')
 Cube = Obj('./models/NoText/Rims&Tires.obj')
 Cube = Obj('./models/Guitar/GUITAR.obj')
 Cube = Obj('./models/NoText/cube.obj')
+Cube = Obj('./models/Face/face.obj')
 face_count, vertex_data = Cube.get_vertex_data()
 
 # apartir de esas lineas, las instrucciones se aplican
@@ -75,8 +76,9 @@ def calculateMatrix(angle):
   translate = glm.translate(i, glm.vec3(0, 0, 0))
   rotate = glm.rotate(glm.radians(angle), glm.vec3(1,1,1))
   scale = glm.scale(i, glm.vec3(4, 4, 4))
-  scale = glm.scale(i, glm.vec3(0.4, 0.4, 0.4))
   scale = glm.scale(i, glm.vec3(0.06, 0.06, 0.06))
+  scale = glm.scale(i, glm.vec3(0.4, 0.4, 0.4))
+  scale = glm.scale(i, glm.vec3(1, 1, 1))
 
   model = translate * rotate * scale
 
