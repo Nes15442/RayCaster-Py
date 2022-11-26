@@ -11,8 +11,8 @@
 --------------------------------------
 '''
 
-from .util import color
 import struct
+color = lambda r, g, b: bytes([b, g, r])
 
 class Texture:
   def __init__(self, path):

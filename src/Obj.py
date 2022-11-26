@@ -10,17 +10,26 @@
 --------------------------------------
 '''
 
-class Obj(object):
+import random
+
+from .MStructs.Vector import V3
+from .Texture import Texture
+import numpy as np
+
+class Obj:
   '''
   .obj file reader
 
   Atributes
   ---------
-  lines: lines written in the .obj file
-  vertices: Vertices of the model
-  faces: faces of the model
+  - lines: lines written in the .obj file
+  - vertices: Vertices of the model
+  - faces: faces of the model
   '''
   def __init__(self, filename):
+    self.object_data = []
+    self.count_faces = 0
+
     with open(filename) as f:
       self.lines = f.read().splitlines()
     
@@ -64,3 +73,56 @@ class Obj(object):
               lambda v: v != '', value.split(' ')
             ))
           ])
+
+  def load_model(self, texture_path):
+    if texture_path:
+      self.texture = Texture(texture_path)
+
+    for face in self.faces:
+      face_vertex = []
+      text_vertex = []
+      normal_vertex = []
+
+      for actual_v in face:
+        face_vertex.append(self.vertices[actual_v[0] - 1])
+
+        temp_texture = self.tverctices[actual_v[1] - 1] if texture_path else [0, 0, 0]
+        text_vertex.append(temp_texture)
+
+        temp_normals = self.n_vertices[actual_v[2] - 1] \
+          if len(self.n_vertices) - 1 >= actual_v[2] - 1 \
+          else [0, 0, 0]
+        normal_vertex.append(temp_normals)
+
+      self.poly_triangle(face_vertex, text_vertex, normal_vertex)
+
+  def poly_triangle(self, face:list[V3], text:list[V3], normals:list[V3]):
+    if len(face) < 3: raise Exception('Invalid Polygon:', face)
+
+    for index in range(len(face) - 2):
+      self.count_faces += 3
+      vertex = [face[0], face[index+1], face[index+2]]
+      t_normals = [normals[0], normals[index+1], normals[index+2]]
+      textures = [text[0], text[index+1], text[index+2]]
+
+      for i in range(3):
+        # Vertex
+        self.object_data = self.object_data + vertex[i]
+
+        # Color
+        # self.object_data = self.object_data + [
+        #   random.random(),
+        #   random.random(),
+        #   random.random()
+        # ]
+
+        # Normals        
+        self.object_data = self.object_data + normals[i]
+        
+        # Textures        
+        self.object_data = self.object_data + textures[i]
+    
+  def get_vertex_data(self, texture_path= None):
+    self.load_model(texture_path)
+    vertex_data = np.array(self.object_data, dtype=np.float32)
+    return self.count_faces, vertex_data

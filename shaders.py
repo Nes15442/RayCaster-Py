@@ -24,8 +24,8 @@ in vec3 ourColor;
 
 void main()
 {
-  // fragColor = vec4(ourColor.x, ourColor.y, ourColor.z, 1.0f);
-  fragColor = vec4(color, 1.0f);
+  fragColor = vec4(ourColor.x, ourColor.y, ourColor.z, 1.0f);
+  // fragColor = vec4(color, 1.0f);
 }
 '''
 

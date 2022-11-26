@@ -1,10 +1,10 @@
 import pygame
 import numpy
-import random
 from OpenGL.GL import *
 from OpenGL.GL.shaders import compileProgram, compileShader
 import glm
 from shaders import shaders
+from src.Obj import *
 
 pygame.init()
 
@@ -22,12 +22,12 @@ shader = compileProgram(
 )
 glUseProgram(shader)
 
-vertex_data = numpy.array([
-  -0.5, -0.5, 0.0, 1.0, 0.0, 0.0,
-  0.5, -0.5, 0.0, 0.0, 1.0, 0.0,
-  0.0, 0.5, 0.0, 0.0, 0.0, 1.0
-], dtype=numpy.float32)
-
+Cube = Obj('./models/NoText/Sphere.obj')
+Cube = Obj('./models/SpaceX/f.obj')
+Cube = Obj('./models/NoText/Rims&Tires.obj')
+Cube = Obj('./models/Guitar/GUITAR.obj')
+Cube = Obj('./models/NoText/cube.obj')
+face_count, vertex_data = Cube.get_vertex_data()
 
 # apartir de esas lineas, las instrucciones se aplican
 # al vertex_buffer_object especificamente
@@ -51,29 +51,32 @@ glVertexAttribPointer(
   3,
   GL_FLOAT,
   GL_FALSE,
-  6 * 4, # Offset de 6 floats de 4 bytes cada uno
+  9 * 4, # Offset de 6 floats de 4 bytes cada uno
   ctypes.c_void_p(0) # void pointer
 )
 
 glEnableVertexAttribArray(0)
 
 # Cargar colores
+
 glVertexAttribPointer(
   1, # ubicacion para shader
   3,
   GL_FLOAT,
   GL_FALSE,
-  6 * 4, # Offset de 6 floats de 4 bytes cada uno
+  9 * 4, # Offset de 6 floats de 4 bytes cada uno
   ctypes.c_void_p(3 * 4) # Offset del inicio, void pointer
 )
-
+ 
 glEnableVertexAttribArray(1)
 
 def calculateMatrix(angle):
   i = glm.mat4(1)
   translate = glm.translate(i, glm.vec3(0, 0, 0))
-  rotate = glm.rotate(i, glm.radians(angle), glm.vec3(1, 1, 0.5))
-  scale = glm.scale(i, glm.vec3(1, 1, 1))
+  rotate = glm.rotate(glm.radians(angle), glm.vec3(1,1,1))
+  scale = glm.scale(i, glm.vec3(4, 4, 4))
+  scale = glm.scale(i, glm.vec3(0.4, 0.4, 0.4))
+  scale = glm.scale(i, glm.vec3(0.06, 0.06, 0.06))
 
   model = translate * rotate * scale
 
@@ -105,23 +108,15 @@ glClearColor(0.1, 0.1, 0.3, 1)
 
 r = 0
 running = True
+clicking = False
 while running:
   # Clear
   glClear(GL_COLOR_BUFFER_BIT)
 
   # Calculate
-  r += 0.02
-  color = glm.vec3(1, 1, 1)
-
-  glUniform3fv(
-    glGetUniformLocation(shader,'color'),
-    1,
-    glm.value_ptr(color)
-  )
-
   calculateMatrix(r)
-  glDrawArrays(GL_TRIANGLES, 0, 3)
-  #pygame.time.wait(10)
+  glDrawArrays(GL_TRIANGLES, 0, face_count)
+  r += 0.2
 
   # Flip
   pygame.display.flip()
@@ -130,4 +125,14 @@ while running:
   for event in pygame.event.get():
     if event.type == pygame.QUIT:
       running = False
-  
+
+    elif event.type == pygame.MOUSEBUTTONDOWN:
+      if event.button == 1:
+        clicking = True
+
+    elif event.type == pygame.MOUSEBUTTONUP:
+      if event.button == 1:
+        clicking = False
+
+    elif event.type == pygame.MOUSEMOTION:
+      pass
