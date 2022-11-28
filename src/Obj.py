@@ -10,10 +10,7 @@
 --------------------------------------
 '''
 
-import random
-
 from .MStructs.Vector import V3
-from .Texture import Texture
 import numpy as np
 
 class Obj:
@@ -75,9 +72,6 @@ class Obj:
           ])
 
   def load_model(self, texture_path):
-    if texture_path:
-      self.texture = Texture(texture_path)
-
     for face in self.faces:
       face_vertex = []
       text_vertex = []
@@ -86,12 +80,12 @@ class Obj:
       for actual_v in face:
         face_vertex.append(self.vertices[actual_v[0] - 1])
 
-        temp_texture = self.tverctices[actual_v[1] - 1] if texture_path else [0, 0, 0]
+        temp_texture = self.tverctices[actual_v[1] - 1] if texture_path else (0, 0)
         text_vertex.append(temp_texture)
 
         temp_normals = self.n_vertices[actual_v[2] - 1] \
           if len(self.n_vertices) - 1 >= actual_v[2] - 1 \
-          else [0, 0, 0]
+          else (0, 0, 0)
         normal_vertex.append(temp_normals)
 
       self.poly_triangle(face_vertex, text_vertex, normal_vertex)
@@ -101,28 +95,26 @@ class Obj:
 
     for index in range(len(face) - 2):
       self.count_faces += 3
-      vertex = [face[0], face[index+1], face[index+2]]
-      t_normals = [normals[0], normals[index+1], normals[index+2]]
-      textures = [text[0], text[index+1], text[index+2]]
+      vertex = (face[0], face[index+1], face[index+2])
+      t_normals = (normals[0], normals[index+1], normals[index+2])
+      textures = (text[0], text[index+1], text[index+2])
 
       for i in range(3):
         # Vertex
-        self.object_data = self.object_data + vertex[i]
-
-        # Color
-        # self.object_data = self.object_data + [
-        #   random.random(),
-        #   random.random(),
-        #   random.random()
-        # ]
+        self.object_data.append(vertex[i][0])
+        self.object_data.append(vertex[i][1])
+        self.object_data.append(vertex[i][2])
 
         # Normals        
-        self.object_data = self.object_data + normals[i]
+        self.object_data.append(t_normals[i][0])
+        self.object_data.append(t_normals[i][1])
+        self.object_data.append(t_normals[i][2])
         
         # Textures        
-        self.object_data = self.object_data + textures[i]
+        self.object_data.append(1 - textures[i][0])
+        self.object_data.append(1 - textures[i][1])
     
-  def get_vertex_data(self, texture_path= None):
+  def get_vertex_data(self, texture_path=False):
     self.load_model(texture_path)
     vertex_data = np.array(self.object_data, dtype=np.float32)
     return self.count_faces, vertex_data
