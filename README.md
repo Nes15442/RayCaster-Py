@@ -25,10 +25,17 @@
 
 - `main.py`: Programa principal.
 
-## 🕹️ Getting Started
+## ⚒️ Getting Started
 
 1. Ejecute el archivo `main.py`.
 2. Si no existen errores en ejecución, se abrira una ventana con la enderizacion del modelo.
+
+## 🕹️ Instrucciones
+
+Cuando se abra la ventana de pygame se pueden usar los siguientes controles:
+- `click` y `arrastrar`: para mover la camara (rotar el modelo)
+- `1`, `2` y `3`: para cambiar de shader.
+- `SpaceBar`: para cambiar de modo de renderizado.
 
 ## 🤓 Autor
 
