@@ -6,11 +6,10 @@
   Obj.py (Object)
   - Object used to read .obj models
 
-  Last modified (yy-mm-dd): 2022-09-17
+  Last modified (yy-mm-dd): 2022-11-28
 --------------------------------------
 '''
 
-from .MStructs.Vector import V3
 import numpy as np
 
 class Obj:
@@ -22,6 +21,9 @@ class Obj:
   - lines: lines written in the .obj file
   - vertices: Vertices of the model
   - faces: faces of the model
+  - n_vertices: normal vertices
+  - object_data: vertex data for openGl
+  - count_faces: polygon count for openGL
   '''
   def __init__(self, filename):
     self.object_data = []
@@ -90,7 +92,7 @@ class Obj:
 
       self.poly_triangle(face_vertex, text_vertex, normal_vertex)
 
-  def poly_triangle(self, face:list[V3], text:list[V3], normals:list[V3]):
+  def poly_triangle(self, face:list, text:list, normals:list):
     if len(face) < 3: raise Exception('Invalid Polygon:', face)
 
     for index in range(len(face) - 2):
@@ -111,7 +113,7 @@ class Obj:
         self.object_data.append(t_normals[i][2])
         
         # Textures        
-        self.object_data.append(1 - textures[i][0])
+        self.object_data.append(textures[i][0])
         self.object_data.append(1 - textures[i][1])
     
   def get_vertex_data(self, texture_path=False):

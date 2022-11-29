@@ -6,22 +6,23 @@
 
 # ✅Rubrica
 
-  - [ ] 20 puntos por cada shader distinto que se implemente. Máximo de 3 shaders (pueden poner los shaders que quieran, pero solo los primeros 3 valen puntos, si el shader no hace nada más que pasar las variables al pipeline no cuenta).
+  - [x] 20 puntos por cada shader distinto que se implemente. Máximo de 3 shaders (pueden poner los shaders que quieran, pero solo los primeros 3 valen puntos, si el shader no hace nada más que pasar las variables al pipeline no cuenta).
   - [x] 10 puntos por utilizar texturas
-  - [x] 10 puntos por utilizar normales
-  - [ ] 20 puntos por implementar una cámara (para que valga puntos, la cámara debe poder moverse o rotar)
+  - [ ] 10 puntos por utilizar normales.
+    > Utilizo las normales en los shaders solo por motivos esteticos
+  - [x] 20 puntos por implementar una cámara (para que valga puntos, la cámara debe poder moverse o rotar)
   - [x] 20 puntos gratis!
 
 ## 🗃️ Estructura de Archivos
 
-- **`models`**
-  - Dentro de esta carpeta se encuentran los modelos a utilizar.
-  - **`NoText`**: En esta carpeta estan los modelos sin texturas.
-  - En las demás carpetas estan los modelos con texturas.
+- **`models`**: Dentro de esta carpeta se encuentran los modelos a utilizar.
+  - `PaperPunch.obj`: Objeto a renderizar.
+  - `paperPunch_texture.tga`: Textura del objeto.
 
-- **`src`**: Codigo del software renderer (proyecto anterior) por si se necesita en un futuro.
+- **`src`**: Implementacion de lector de archivos .obj y shaders para OpenGL
+  - `shaders.py`: Contiene los shaders a utilizar en openGL.
+  - `Obj.py`: Lector de archivos .obj. (tambien carga el vertex_data)
 
-- `shaders.py`: Contiene los shaders a utilizar en openGL.
 - `main.py`: Programa principal.
 
 ## 🕹️ Getting Started
