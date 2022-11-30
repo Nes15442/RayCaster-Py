@@ -1,77 +1,43 @@
-import pygame
-import random
-from OpenGL.GL import *
 from cmath import pi
 from math import cos, sin, atan2
 
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-
-SKY = (0, 100, 200)
-GROUND = (200, 200, 100)
-
-TRANSPARENT = (152, 0, 136, 255)
-
-colors = [
-  (0,20,10),
-  (4,40,63),
-  (0,91,82),
-  (219,248,38),
-  (2,248,50),
-]
-
-textures = {
-  '1': pygame.image.load('./Textures/wall1.png'),
-  '2': pygame.image.load('./Textures/wall2.png'),
-  '3': pygame.image.load('./Textures/wall3.png'),
-  '4': pygame.image.load('./Textures/wall4.png'),
-  '5': pygame.image.load('./Textures/wall5.png'),
-}
-
-sprite1 = pygame.image.load('./sprites/sprite1.png')
-
-enemies = [
-  {
-    'x': 150,
-    'y': 150,
-    'sprite': sprite1
-  },
-  {
-    'x': 300,
-    'y': 300,
-    'sprite': sprite1
-  }
-]
-
-
 class RayCaster:
-  def __init__(self, screen) -> None:
-    self.screen:pygame.display = screen
+  def __init__(self, screen, enemies, walls) -> None:
+    self.screen = screen
     _, _, self.width, self.height = screen.get_rect()
     self.map = []
     self.blocksize = 50
     self.player = {
-      "x": int(self.blocksize + self.blocksize / 2), 
+      "x": int(self.blocksize + self.blocksize / 2),
       "y": int(self.blocksize + self.blocksize / 2),
+      "last_x": int(self.blocksize + self.blocksize / 2),
+      "last_y": int(self.blocksize + self.blocksize / 2),
       'fov': int(pi/3),
       'a': int(pi/3)
     }
     self.clearZ()
+    self.enemies = enemies
+    self.walls = walls
   
   def clearZ(self):
-    self.zbuffer = [-99 for z in range(0, int(self.width/2))]
+    self.zbuffer = [-99 for z in range(self.width)]
 
-  def point(self, x, y, c = WHITE):
+  def point(self, x, y, c = (255, 255, 255)):
     self.screen.set_at((x, y), c)
-    self.screen.set_at((x, y), c)
+  
+  def point(self, x, y, c = (255, 255, 255)):
+    self.screen.fill(
+      c,
+      (x, y, 1, 1)
+    )
 
   def block(self, x, y, wall):
     for i in range(x, x + self.blocksize):
       for j in range(y, y + self.blocksize):
         tx = int((i - x) * 128 / self.blocksize)
         ty = int((j - y) * 128 / self.blocksize)
-        c = wall.get_at((tx,ty))
-        self.point(i,j,c)
+        c = wall.get_at((tx, ty))
+        self.point(i, j, c)
 
   def load_map(self, filename):
     with open(filename) as f:
@@ -91,66 +57,59 @@ class RayCaster:
       j = int(y/self.blocksize)
 
       if self.map[j][i] != ' ':
-        hitx = x -i*self.blocksize
-        hity = y -j*self.blocksize
+        hitx = x - i * self.blocksize
+        hity = y - j * self.blocksize
 
         if 1 < hitx < self.blocksize - 1:
-            maxhit = hitx
+          maxhit = hitx
         else:
-            maxhit = hity
+          maxhit = hity
 
         tx = int(maxhit * 128 / self.blocksize)
         return d, self.map[j][i], tx
 
-      self.point(x, y)
-      d += 1
+      #self.point(x, y)
+      d += 0.5
 
   def draw_map(self):
-    for x in range(0, 500, self.blocksize):
-      for y in range(0, 500, self.blocksize):
+    for x in range(0, 50, self.blocksize):
+      for y in range(0, 50, self.blocksize):
         j = int(y/self.blocksize)
         i = int(x/self.blocksize)
         if self.map[j][i] != ' ':
-          self.block(x, y, textures[self.map[j][i]])
+          self.block(x, y, self.walls[self.map[j][i]])
 
   def draw_player(self):
     self.point(self.player['x'], self.player['y'])
 
   def render(self):
     self.draw_map()
-    self.draw_player()
-
-    density = 100
     fov = self.player['fov']
-    
-    # minimap
-    for i in range(0, density):
-      a = self.player['a'] - (fov/2) + (fov * i/density)
-      d, c, _ = self.cast_ray(a)
-    
-    self.point(self.player['x'], self.player['y'], (255, 255, 255))
-
-    # Division
-    for i in range(0, 500):
-      self.point(499, i)
-      self.point(500, i)
-      self.point(501, i)
     
     # 3D world
     fov = self.player['fov']
-    for i in range(0, int(self.width/2)):
-      a = self.player['a'] - (fov/2) + (fov * i/(self.width/2))
+    for i in range(0, int(self.width)):
+      a = self.player['a'] - (fov/2) + (fov * i/(self.width))
+      cos_a = cos(a - self.player['a'])
       d, c, tx = self.cast_ray(a)
 
-      x = int(self.width/2) + i
-      h = self.width/(d * cos(a - self.player['a'])) * 20
+      # Colisiones con paredes
+      if d == 0:
+        self.player['x'] = self.player['last_x']
+        self.player['y'] = self.player['last_y']
+        a = self.player['a'] - (fov/2) + (fov * i/(self.width))
+        d, c, tx = self.cast_ray(a)
+      
+      h_den = d * cos_a
 
       if self.zbuffer[i] < d:
+        h = (self.width/h_den) * 20
+        x = i
+
         self.draw_strake(x, h, c, tx)
         self.zbuffer[i] = d
     
-    for enemy in enemies:
-      self.point(enemy['x'], enemy['y'], (255, 0, 0))
+    for enemy in self.enemies:
       self.draw_sprite(enemy)
 
   def draw_strake(self, x, h, c, tx):
@@ -160,7 +119,7 @@ class RayCaster:
 
     for y in range(start_y, end_y):
       ty = int((y - start_y) * 128/height)
-      color = textures[c].get_at((tx, ty))
+      color = self.walls[c].get_at((tx, ty))
       self.point(x, y, color)
 
   def draw_sprite(self, sprite):
@@ -173,16 +132,13 @@ class RayCaster:
     sprite_a = atan2(
       sprite['y'] - self.player['y'],
       sprite['x'] - self.player['x']
-    )
-    
+    )    
     sprite_x = int(
-      500 + # Offset del mapa
+      0 + # Offset del mapa
       (sprite_a - self.player['a']) * 500/self.player['fov']
       + sprite_size/2
     )
-
     sprite_y = int(self.height/2 - sprite_size/2)
-
 
     for x in range(sprite_x, sprite_x + sprite_size):
       for y in range(sprite_y, sprite_y + sprite_size):
@@ -190,58 +146,8 @@ class RayCaster:
         ty = int((y - sprite_y) * 128/sprite_size)
         c = sprite['sprite'].get_at((tx, ty))
         
-        mid_view = int(self.width/2)
-        if c != TRANSPARENT:
-          if mid_view < x < self.width:
-            if self.zbuffer[x - mid_view] >= d:
+        if c != (0, 0, 0, 0):
+          if 0 < x < self.width:
+            if self.zbuffer[x - 0] >= d:
               self.point(x, y, c)
-              self.zbuffer[x - mid_view] = d
-
-
-pygame.init()
-screen = pygame.display.set_mode((1000, 500), pygame.DOUBLEBUF)
-r = RayCaster(screen)
-r.load_map('./map.txt')
-
-colors = [
-  (),
-  (255/4, 255/40, 255/63),
-  (0, 255/91, 255/82),
-  (255/219, 255/242, 255/38),
-]
-
-running = True
-while running:
-  #screen.fill(BLACK, (0, 0, r.width/2, r.height))
-  #screen.fill(SKY, (r.width/2, 0, r.width, r.height/2))
-  #screen.fill(GROUND, (r.width/2, r.height/2, r.width, r.height/2))
-  screen.fill((113, 113, 113))
-  r.clearZ()
-  r.render()
-
-  pygame.display.flip()
-
-  for event in pygame.event.get():
-    match event.type:
-      case pygame.QUIT:
-        running = False
-
-      case pygame.KEYDOWN:
-        match event.key:
-          case pygame.K_RIGHT:
-            r.player['x'] += 10
-        
-          case pygame.K_LEFT:
-            r.player['x'] -= 10
-        
-          case pygame.K_UP:
-            r.player['y'] -= 10
-        
-          case pygame.K_DOWN:
-            r.player['y'] += 10
-        
-          case pygame.K_a:
-            r.player['a'] -= pi/10
-        
-          case pygame.K_d:
-            r.player['a'] += pi/10
+              self.zbuffer[x - 0] = d
