@@ -83,14 +83,21 @@ class RayCaster:
     self.point(self.player['x'], self.player['y'])
 
   def render(self):
-    self.draw_map()
-    fov = self.player['fov']
+    # self.draw_map()
     
     # 3D world
     fov = self.player['fov']
     for i in range(0, int(self.width)):
       a = self.player['a'] - (fov/2) + (fov * i/(self.width))
       cos_a = cos(a - self.player['a'])
+
+      # Colisiones con paredes
+      if cos_a == 0:
+        self.player['x'] = self.player['last_x']
+        self.player['y'] = self.player['last_y']
+        a = self.player['a'] - (fov/2) + (fov * i/(self.width))
+        cos_a = cos(a - self.player['a'])
+      
       d, c, tx = self.cast_ray(a)
 
       # Colisiones con paredes
@@ -100,14 +107,11 @@ class RayCaster:
         a = self.player['a'] - (fov/2) + (fov * i/(self.width))
         d, c, tx = self.cast_ray(a)
       
-      h_den = d * cos_a
 
       if self.zbuffer[i] < d:
-        h = (self.width/h_den) * 20
-        x = i
-
-        self.draw_strake(x, h, c, tx)
         self.zbuffer[i] = d
+        h = (self.width/(d * cos_a)) * 20
+        self.draw_strake(i, h, c, tx)
     
     for enemy in self.enemies:
       self.draw_sprite(enemy)

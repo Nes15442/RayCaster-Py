@@ -7,7 +7,7 @@
 # ✅Rubrica
 
   - [x] (0 a 30 puntos) [Criterio subjetivo] Según la estética de su nivel
-  - [x] (0 a 30 puntos) Según cuantos fps pueda renderizar su software
+  - [x] (0 a 30 puntos) Según cuantos fps pueda renderizar su software (5 fps en promedio)
     - [x] 10 puntos mas por colocar un contador de fps
   - [x] (20 puntos) Por implementar una cámara con movimiento hacia delante y hacia atrás y rotación (como la que hicimos en clase)
     - [x] No debe poder atravesar a las paredes 

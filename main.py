@@ -45,35 +45,30 @@ if __name__ == '__main__':
   pg.init()
   screen = pg.display.set_mode((500, 500), pg.DOUBLEBUF | pg.HWACCEL)
 
-  # Title screen
+  # ------- Title screen ------- 
   running = True
-  titleImg = pg.image.load('./backgrounds/title.png').convert()
+  titleImg = pg.image.load('./backgrounds/1.png').convert()
   screen.blit(titleImg, (0, 0))
 
-  font = pg.font.SysFont('Arial', 18, bold=True)
-
-  yellow = (255, 255, 255)
-  fps = 'Presione Caulquier Tecla Para Continuar'
-  fps = font.render(fps, 1, yellow)
-  screen.blit(fps, (60, 20))
-  
-  fps = 'WASD -> moverse'
-  fps = font.render(fps, 1, yellow)
-  screen.blit(fps, (60, 20 + 20))
-
-  fps = 'flechas Derecha e Izquierda para rotar'
-  fps = font.render(fps, 1, yellow)
-  screen.blit(fps, (60, 20 + 2 * 20))
-  
-  fps = 'Click para usar el mouse para rotar'
-  fps = font.render(fps, 1, yellow)
-  screen.blit(fps, (60, 20 + 3 * 20))
-  
-  fps = 'Click para dejar de usar el mouse para rotar'
-  fps = font.render(fps, 1, yellow)
-  screen.blit(fps, (60, 20 + 4 * 20))
-
   pg.display.flip()
+
+  soundtrack = pg.mixer.music.load('./sounds/Horizon.mp3')
+  pg.mixer.music.play(-1)
+  while running:
+    for event in pg.event.get():
+      match event.type:
+        case pg.MOUSEBUTTONDOWN:
+          running = False
+
+        case pg.KEYDOWN:
+          running = False
+  
+  # ------- Instrucciones ------- 
+  titleImg = pg.image.load('./backgrounds/2.png').convert()
+  screen.blit(titleImg, (0, 0))
+  pg.display.flip()
+
+  running = True
   while running:
     for event in pg.event.get():
       match event.type:
@@ -99,8 +94,12 @@ if __name__ == '__main__':
   running = True
   useMouse = False
   while running:
-    clock.tick()
+
+    print([r.player['x'], r.player['y']])
+    if 106 < r.player['x'] < 165 and 311 < r.player['y'] < 332:
+      running = False
     # clear
+    clock.tick()
     screen.fill((118, 188, 222))
     screen.fill((84, 121, 89), (0, r.height/2, r.width, r.height/2))
     r.clearZ()
@@ -124,12 +123,10 @@ if __name__ == '__main__':
           useMouse = not useMouse
 
         case pg.KEYDOWN:
-          if event.key in [pg.K_RIGHT, pg.K_LEFT, pg.K_UP, pg.K_DOWN, pg.K_a, pg.K_d]:
-            r.player['last_x'] = r.player['x']
-            r.player['last_y'] = r.player['y']
+          r.player['last_x'] = r.player['x']
+          r.player['last_y'] = r.player['y']
 
           match event.key:
-
             case pg.K_RIGHT:
               r.player['a'] += pi/10
           
@@ -137,24 +134,20 @@ if __name__ == '__main__':
               r.player['a'] -= pi/10
           
             case pg.K_w:
-              r.player['x'] += int(10 * cos(r.player['a']))
-              r.player['y'] += int(10 * sin(r.player['a']))
+              r.player['x'] += int(20 * cos(r.player['a']))
+              r.player['y'] += int(20 * sin(r.player['a']))
           
             case pg.K_s:
-              r.player['x'] -= int(10 * cos(r.player['a']))
-              r.player['y'] -= int(10 * sin(r.player['a']))
+              r.player['x'] -= int(20 * cos(r.player['a']))
+              r.player['y'] -= int(20 * sin(r.player['a']))
           
             case pg.K_a:
-              a = r.player['a']
-
-              r.player['x'] -= int(10 * cos(pi/2 + a))
-              r.player['y'] -= int(10 * sin(pi/2 + a))
+              r.player['x'] -= int(20 * cos(pi/2 + r.player['a']))
+              r.player['y'] -= int(20 * sin(pi/2 + r.player['a']))
           
             case pg.K_d:
-              a = r.player['a']
-
-              r.player['x'] += int(10 * cos(pi/2 + a))
-              r.player['y'] += int(10 * sin(pi/2 + a))
+              r.player['x'] += int(20 * cos(pi/2 + r.player['a']))
+              r.player['y'] += int(20 * sin(pi/2 + r.player['a']))
         
       if r.player['a'] > 2 * pi:
         r.player['a'] = r.player['a'] - 2 * pi
@@ -165,3 +158,17 @@ if __name__ == '__main__':
     if useMouse:
       r.player['a'] += pi * (pg.mouse.get_rel()[1] / 30)
       pg.mouse.set_pos((int(r.width/2), int(r.height/2)))
+
+  titleImg = pg.image.load('./backgrounds/win.png').convert()
+  screen.blit(titleImg, (0, 0))
+  pg.display.flip()
+
+  running = True
+  while running:
+    for event in pg.event.get():
+      match event.type:
+        case pg.MOUSEBUTTONDOWN:
+          running = False
+
+        case pg.KEYDOWN:
+          running = False
