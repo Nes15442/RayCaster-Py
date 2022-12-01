@@ -17,6 +17,15 @@ class RayCaster:
     self.clearZ()
     self.enemies = enemies
     self.walls = walls
+
+  def reset_level(self, map, enemies):
+    self.load_map(map)
+    self.player["x"] =  int(self.blocksize + self.blocksize / 2)
+    self.player["y"] =  int(self.blocksize + self.blocksize / 2)
+    self.player["last_x"] =  int(self.blocksize + self.blocksize / 2)
+    self.player["last_y"] =  int(self.blocksize + self.blocksize / 2)
+    self.player['a'] =  int(pi/3)
+    self.enemies = enemies
   
   def clearZ(self):
     self.zbuffer = [-99 for z in range(self.width)]

@@ -14,7 +14,7 @@
     - [x] 10 puntos más por implementar rotación con el mouse (solo horizontal)
   - [ ] (10 puntos) Por implementar un minimapa que muestre la posición de jugador en el mundo. No puede estar lado a lado del mapa principal, debe estar en una esquina. 
   - [x] (5 puntos) Por agregar música de fondo.
-  - [x] (10 puntos) Por agregar efectos de sonido
+  - [ ] (10 puntos) Por agregar efectos de sonido
   - [ ] (20 puntos) Por agregar al menos 1 animación a alguna sprite en la pantalla
   - [x] (5 puntos) Por agregar una pantalla de bienvenida 
     - [x] (10 puntos mas) si la pantalla permite seleccionar entre multiples niveles 
@@ -23,27 +23,31 @@
 
 ## 🗃️ Estructura de Archivos
 
-- **`models`**: Dentro de esta carpeta se encuentran los modelos a utilizar.
-  - `PaperPunch.obj`: Objeto a renderizar.
-  - `paperPunch_texture.tga`: Textura del objeto.
+- **`backgrounds`**: Imagenes de fondo (para menus y titulos)
+- **`maps`**: mapas de niveles del juego.
+  - `map1.txt`: Nivel 1
+  - `map2.txt`: Nivel 2
+  - `map3.txt`: Nivel 3
+- **`sounds`**: Musica del juego.
+- **`sprites`**: sprites para enemigos.
+- **`Textures`**: Texturas para paredes.
 
-- **`src`**: Implementacion de lector de archivos .obj y shaders para OpenGL
-  - `shaders.py`: Contiene los shaders a utilizar en openGL.
-  - `Obj.py`: Lector de archivos .obj. (tambien carga el vertex_data)
-
+- `cast.py`: Implementacion de rayCaster.
 - `main.py`: Programa principal.
 
 ## ⚒️ Getting Started
 
 1. Ejecute el archivo `main.py`.
-2. Si no existen errores en ejecución, se abrira una ventana con la enderizacion del modelo.
+2. Si no existen errores en ejecución, se abrira una ventana con el juego.
 
 ## 🕹️ Instrucciones
 
 Cuando se abra la ventana de pygame se pueden usar los siguientes controles:
-- `click` y `arrastrar`: para mover la camara (rotar el modelo)
-- `1`, `2` y `3`: para cambiar de shader.
-- `SpaceBar`: para cambiar de modo de renderizado.
+
+- `W`, `A`, `S`, `D` para moverse.
+- Flechas `<-` y `->` para rotar.
+- `click` para usar el mouse para rotar.
+- `click` otra vez para dejar de usar el mouse para rotar.
 
 ## 🤓 Autor
 
