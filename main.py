@@ -3,14 +3,6 @@ from cmath import pi
 from math import cos, sin
 from cast import RayCaster
 
-colors = [
-  (0,20,10),
-  (4,40,63),
-  (0,91,82),
-  (219,248,38),
-  (2,248,50),
-]
-
 textures = {
   '1': pg.image.load('./Textures/wall1.png'),
   '2': pg.image.load('./Textures/wall2.png'),
@@ -19,27 +11,9 @@ textures = {
   '5': pg.image.load('./Textures/wall5.png'),
 }
 
-sprite1 = pg.image.load('./sprites/sprite1.png')
-sprite2 = pg.image.load('./sprites/sprite2.png')
-sprite3 = pg.image.load('./sprites/sprite3.png')
-
-enemies = [
-  {
-    'x': 150,
-    'y': 150,
-    'sprite': sprite1
-  },
-  {
-    'x': 300,
-    'y': 300,
-    'sprite': sprite2
-  },
-  {
-    'x': 380,
-    'y': 380,
-    'sprite': sprite3
-  }
-]
+sprite1 = pg.image.load('./sprites/sprite2.png')
+sprite2 = pg.image.load('./sprites/sprite3.png')
+sprite3 = pg.image.load('./sprites/sprite1.png')
 
 if __name__ == '__main__':
   pg.init()
@@ -78,10 +52,85 @@ if __name__ == '__main__':
         case pg.KEYDOWN:
           running = False
 
-  r = RayCaster(screen, enemies, textures)
+  # ------- Levels ------- 
+  running = True
   level = 1
-  last_level = 1
-  r.load_map('./maps/map1.txt')
+  while running:
+    for event in pg.event.get():
+      if event.type == pg.KEYDOWN:
+        match event.key:
+          case pg.K_1:
+            level = 0
+            running = False
+          
+          case pg.K_2:
+            level = 1
+            running = False
+          
+          case pg.K_3:
+            level = 2
+            running = False
+
+  SKY = (
+    (118, 188, 222),
+    (143, 116, 104),
+    (86, 45, 104)
+  )
+
+  GROUND = (
+    (84, 121, 89),
+    (136, 124, 38),
+    (102, 119, 211)
+  )
+
+  MAPS = (
+    './maps/map1.txt',
+    './maps/map2.txt',
+    './maps/map3.txt',
+  )
+
+  GOALS = (
+    ((106, 311), (165, 332)),
+    ((355, 430), (396, 500)),
+    ((355, 430), (396, 500)),
+  )
+
+  enemies = [
+  (
+    {
+      'x': 150,
+      'y': 150,
+      'sprite': sprite1
+    },
+    {
+      'x': 300,
+      'y': 300,
+      'sprite': sprite2
+    },
+    {
+      'x': 380,
+      'y': 380,
+      'sprite': sprite3
+    }
+  ),
+  (
+    {
+      'x': 300,
+      'y': 300,
+      'sprite': sprite2
+    },
+  ),
+  (
+    {
+      'x': 150,
+      'y': 150,
+      'sprite': sprite1
+    },
+  )
+]
+
+  r = RayCaster(screen, enemies[level], textures)
+  r.load_map(MAPS[level])
 
   clock = pg.time.Clock()
   font = pg.font.SysFont('Arial', 25, bold=True)
@@ -94,14 +143,26 @@ if __name__ == '__main__':
   running = True
   useMouse = False
   while running:
+    if GOALS[level][0][0] < r.player['x'] < GOALS[level][1][0] \
+      and GOALS[level][0][1] < r.player['y'] < GOALS[level][1][1] \
+    :
+      level += 1
+      if level < 3:
+        r.load_map(MAPS[level])
+        r.player["x"] =  int(r.blocksize + r.blocksize / 2)
+        r.player["y"] =  int(r.blocksize + r.blocksize / 2)
+        r.player["last_x"] =  int(r.blocksize + r.blocksize / 2)
+        r.player["last_y"] =  int(r.blocksize + r.blocksize / 2)
+        r.player['a'] =  int(pi/3)
+        r.enemies = enemies[level]
+      else:
+        running = False
+        continue
 
-    print([r.player['x'], r.player['y']])
-    if 106 < r.player['x'] < 165 and 311 < r.player['y'] < 332:
-      running = False
     # clear
     clock.tick()
-    screen.fill((118, 188, 222))
-    screen.fill((84, 121, 89), (0, r.height/2, r.width, r.height/2))
+    screen.fill(SKY[level])
+    screen.fill(GROUND[level], (0, r.height/2, r.width, r.height/2))
     r.clearZ()
 
     # Render
@@ -123,8 +184,9 @@ if __name__ == '__main__':
           useMouse = not useMouse
 
         case pg.KEYDOWN:
-          r.player['last_x'] = r.player['x']
-          r.player['last_y'] = r.player['y']
+          if event.key in [pg.K_w, pg.K_a, pg.K_s, pg.K_d]:
+            r.player['last_x'] = r.player['x']
+            r.player['last_y'] = r.player['y']
 
           match event.key:
             case pg.K_RIGHT:
@@ -172,3 +234,7 @@ if __name__ == '__main__':
 
         case pg.KEYDOWN:
           running = False
+
+        case pg.QUIT:
+          running = False
+

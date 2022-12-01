@@ -5,7 +5,6 @@ class RayCaster:
   def __init__(self, screen, enemies, walls) -> None:
     self.screen = screen
     _, _, self.width, self.height = screen.get_rect()
-    self.map = []
     self.blocksize = 50
     self.player = {
       "x": int(self.blocksize + self.blocksize / 2),
@@ -40,6 +39,7 @@ class RayCaster:
         self.point(i, j, c)
 
   def load_map(self, filename):
+    self.map = []
     with open(filename) as f:
       for line in f.readlines():
         self.map.append(list(line))
@@ -90,23 +90,13 @@ class RayCaster:
     for i in range(0, int(self.width)):
       a = self.player['a'] - (fov/2) + (fov * i/(self.width))
       cos_a = cos(a - self.player['a'])
-
-      # Colisiones con paredes
-      if cos_a == 0:
-        self.player['x'] = self.player['last_x']
-        self.player['y'] = self.player['last_y']
-        a = self.player['a'] - (fov/2) + (fov * i/(self.width))
-        cos_a = cos(a - self.player['a'])
-      
       d, c, tx = self.cast_ray(a)
 
       # Colisiones con paredes
-      if d == 0:
+      if 0 in [d, cos_a]:
         self.player['x'] = self.player['last_x']
         self.player['y'] = self.player['last_y']
-        a = self.player['a'] - (fov/2) + (fov * i/(self.width))
-        d, c, tx = self.cast_ray(a)
-      
+        return self.render()      
 
       if self.zbuffer[i] < d:
         self.zbuffer[i] = d
